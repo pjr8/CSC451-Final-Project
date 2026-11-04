@@ -1,4 +1,6 @@
-# Early pilot results
+# Original three-hour MLP pilot
+
+The current, more complex forecast is documented in [the recurrent model results](sequence/README.md).
 
 Measured November 4, 2026. This is a one-epoch feasibility check, not a final accuracy evaluation.
 

@@ -1,0 +1,74 @@
+{
+  "purpose": "24-hour temperature-curve forecasting runtime pilot",
+  "device": "cuda",
+  "hardware": "NVIDIA GeForce RTX 3070 Ti",
+  "is_t4_measurement": false,
+  "history_hours": 336,
+  "forecast_hours": 24,
+  "model": "GRU",
+  "hidden_size": 256,
+  "layers": 3,
+  "parameter_count": 997432,
+  "head_dropout": 0.1,
+  "recurrent_dropout": 0.0,
+  "batch_size": 32,
+  "optimizer": "Adam",
+  "learning_rate": 0.001,
+  "gradient_clip_norm": 1.0,
+  "seed": 11,
+  "full_training_examples": 15306,
+  "selected_training_examples": 1531,
+  "requested_fraction": 0.1,
+  "epochs_completed": 1,
+  "planned_full_epochs": 30,
+  "preparation_seconds": 2.3179033000051277,
+  "mean_training_epoch_seconds": 2.786232200000086,
+  "estimated_full_training_minutes": 13.92752124533028,
+  "validation_seconds_per_epoch": 0.0,
+  "estimated_full_run_minutes": null,
+  "training_estimate_excludes": "data preparation, validation, and checkpoint writing",
+  "full_run_estimate_includes": "training, validation, and checkpoint writing; excludes one-time preparation",
+  "split_examples": {
+    "train": 15306,
+    "validation": 3371,
+    "test": 2528
+  },
+  "first_training_origin_utc": "2023-01-16T00:00:00+00:00",
+  "last_selected_training_origin_utc": "2023-03-20T18:00:00+00:00",
+  "scaling": {
+    "mean_celsius": 2.091500997543335,
+    "std_celsius": 5.071398735046387,
+    "fitted_on": "selected training inputs only",
+    "target_standardized": true
+  },
+  "best_epoch": 1,
+  "history": [
+    {
+      "epoch": 1,
+      "training_seconds": 2.786232200000086,
+      "training_mse_standardized": 0.8699285406290823,
+      "validation_mae_celsius": null,
+      "validation_seconds": 0.0,
+      "checkpoint_seconds": 0.013227399991592392
+    }
+  ],
+  "cleaning": {
+    "raw_records": 40052,
+    "invalid_station_timestamp_or_temperature": 2,
+    "rejected_quality_or_unrecognized_source": 125,
+    "duplicate_station_timestamps": 0,
+    "retained_observations": 39925
+  },
+  "versions": {
+    "python": "3.12.14",
+    "torch": "2.11.0+cu128",
+    "cuda": "12.8",
+    "numpy": "2.3.5",
+    "pandas": "3.0.1"
+  },
+  "measurement_date": "2026-11-04",
+  "execution_environment": "Native Windows, CUDA",
+  "runtime_completed_successfully": true,
+  "full_30_epoch_run_completed": false,
+  "sequence_script_sha256_lf": "9bd7999b5acbb678b2197278314e65b894b941724ea6a34fb3f9053eb9949d47"
+}
