@@ -1,0 +1,52 @@
+{
+  "dataset": "NOAA GHCNh",
+  "station": "USW00014740",
+  "station_name": "HARTFORD-BRADLEY INTL AP",
+  "downloaded": "2026-11-04",
+  "license": "CC0-1.0",
+  "documentation": "https://www.ncei.noaa.gov/oa/global-historical-climatology-network/hourly/doc/ghcnh_DOCUMENTATION.pdf",
+  "documentation_version": "1.1.0 (March 10, 2026)",
+  "license_source": "https://www.ncei.noaa.gov/access/metadata/landing-page/bin/iso?id=gov.noaa.ncdc:C01688",
+  "notes": "Complete original station-year files, compressed without changing the decompressed bytes.",
+  "files": [
+    {
+      "file": "GHCNh_USW00014740_2023.psv.gz",
+      "year": 2023,
+      "url": "https://www.ncei.noaa.gov/oa/global-historical-climatology-network/hourly/access/by-year/2023/psv/GHCNh_USW00014740_2023.psv",
+      "raw_sha256": "f7d3b13b9ed63f3919d076eabb3c611eb17c75cb955324c138f6e6e260a3a612",
+      "gzip_sha256": "5cb4ea98c151e35ec7a97dc64a7e24559e50adac651ce0324d11c5a2ab5596c3",
+      "raw_bytes": 12587100,
+      "gzip_bytes": 1006152,
+      "records": 12855,
+      "columns": 329,
+      "first_observation_utc": "2023-01-01T00:34:00Z",
+      "last_observation_utc": "2023-12-31T23:51:00Z"
+    },
+    {
+      "file": "GHCNh_USW00014740_2024.psv.gz",
+      "year": 2024,
+      "url": "https://www.ncei.noaa.gov/oa/global-historical-climatology-network/hourly/access/by-year/2024/psv/GHCNh_USW00014740_2024.psv",
+      "raw_sha256": "584db683e39af6cdb42ddbdb11c0e5447a06f3e87741a4d5f45d3565baf3baae",
+      "gzip_sha256": "84ed69628fd3b19a23e2c14c1a6540e4f8f63d01821831781d02d622b12bd4a8",
+      "raw_bytes": 13108859,
+      "gzip_bytes": 1054818,
+      "records": 13677,
+      "columns": 329,
+      "first_observation_utc": "2024-01-01T00:00:00Z",
+      "last_observation_utc": "2024-12-31T23:51:00Z"
+    },
+    {
+      "file": "GHCNh_USW00014740_2025.psv.gz",
+      "year": 2025,
+      "url": "https://www.ncei.noaa.gov/oa/global-historical-climatology-network/hourly/access/by-year/2025/psv/GHCNh_USW00014740_2025.psv",
+      "raw_sha256": "461c910ad3a7077249765237b283cfe2308c9e22af91c43f1c8b3054c497396d",
+      "gzip_sha256": "882bf7cd4a938d1b133f5caccf26f90bab8641b0057e8168a067f33bd38aabe6",
+      "raw_bytes": 12419511,
+      "gzip_bytes": 1015722,
+      "records": 13520,
+      "columns": 329,
+      "first_observation_utc": "2025-01-01T00:00:00Z",
+      "last_observation_utc": "2025-12-31T23:51:00Z"
+    }
+  ]
+}

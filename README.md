@@ -2,6 +2,65 @@
 
 Local temperature forecasting with a small PyTorch neural network. The project will predict the temperature three hours ahead from the previous 24 hourly temperatures and compare it with persistence and linear regression.
 
+## Run the early pilot
+
+[`pilot.py`](pilot.py) trains the `24 → 64 → 32 → 1` MLP for **one epoch on the earliest 10% of complete training examples**, rounded up. It uses Adam, learning rate `0.001`, batch size `64`, and seed `11`. The remaining training examples are counted for the runtime estimate, but are not used to fit this pilot. Scaling is fitted only on the selected pilot inputs.
+
+The complete 2023–2025 station data is included as [compressed raw files](data/README.md), about 3.1 MB total. The script reads and verifies these files; no NOAA download or API key is needed.
+
+With the included data and cleaning rules, there are **17,312 training examples**, **4,287 validation examples**, and **4,070 test examples**. The default pilot trains on the first **1,732** training examples. Raw records and forecasting examples are different counts: one example needs 24 hourly inputs plus a later target.
+
+### Google Colab T4
+
+1. Open a Colab notebook and choose **Runtime → Change runtime type → T4 GPU**.
+2. Run this cell:
+
+```python
+!git clone https://github.com/pjr8/CSC451-Final-Project.git
+%cd CSC451-Final-Project
+!pip -q install -r requirements.txt
+```
+
+3. Save the pilot results to Google Drive so they survive a Colab disconnect:
+
+```python
+from google.colab import drive
+drive.mount('/content/drive')
+!python pilot.py --require-t4 --output-dir '/content/drive/MyDrive/CSC451/pilot'
+```
+
+`--require-t4` stops with an error if the selected runtime is not a T4. The report records the actual GPU name. GPU work is synchronized before and after timing.
+
+### Local CPU check
+
+From the repository directory, with Python 3.10 or newer:
+
+```bash
+python -m pip install -r requirements.txt
+python pilot.py --cpu
+```
+
+A CPU run checks the script, but does not satisfy the assignment's T4 timing requirement.
+
+### Output files
+
+| File | Contents |
+|---|---|
+| `pilot_report.json` | Actual device, sample counts, one-epoch time, 20-epoch runtime estimate, cleaning counts, partition counts, settings, and package versions. |
+| `pilot_checkpoint.pt` | Weights after one pilot epoch plus the input scaling statistics. This is not the final trained model. |
+| `example_input.csv` | The first real pilot example's 24 hourly inputs, in the app's CSV format. |
+| `example_target.json` | That example's observed temperature three hours later and its target timestamp. |
+
+Default outputs go to `outputs/pilot/`, which is excluded from Git. Preparation is timed separately. The estimate is `epoch seconds × full training examples / pilot examples × 20 / 60`. It estimates training time only; confirm it with a full-data epoch before committing to a complete run. A training-loss number from this pilot is not a validation or test score.
+
+The partitions are training **January 2, 2023–December 29, 2024**, validation **December 30, 2024–June 29, 2025**, and test **June 30–December 28, 2025**. This script counts validation/test examples but does not train on them, calculate their scores, or tune using them. See the [quality and hourly-binning policy](data/README.md).
+
+Run the small data-alignment checks with:
+
+```bash
+python -m unittest discover -s tests -v
+```
+
 ## What the data means
 
 Each raw NOAA row is a weather observation from one station at one time. For this project, all observations come from Hartford Bradley International Airport. The first model will use **temperature history only**. The other columns identify the station, organize the observations, or help check data quality.
