@@ -1,0 +1,72 @@
+{
+  "purpose": "One-epoch early pilot; not final model evaluation",
+  "device": "cuda",
+  "hardware": "NVIDIA GeForce RTX 3070 Ti",
+  "is_t4_measurement": false,
+  "seed": 11,
+  "batch_size": 64,
+  "learning_rate": 0.001,
+  "optimizer": "Adam",
+  "loss": "MSE",
+  "architecture": [
+    24,
+    64,
+    32,
+    1
+  ],
+  "parameter_count": 3713,
+  "full_training_examples": 17312,
+  "pilot_examples": 1732,
+  "pilot_fraction": 0.10004621072088725,
+  "pilot_epochs": 1,
+  "pilot_first_origin_utc": "2023-01-03T00:00:00+00:00",
+  "pilot_last_origin_utc": "2023-03-16T03:00:00+00:00",
+  "preparation_seconds": 1.8728040999994846,
+  "epoch_seconds": 0.24304280000797007,
+  "planned_full_epochs": 20,
+  "estimated_full_run_minutes": 0.809768466847186,
+  "estimated_under_30_minutes": true,
+  "training_epoch_mse_celsius_squared": 25.550979719976905,
+  "scaler_fitted_on": "pilot training inputs only",
+  "cleaning": {
+    "raw_records": 40052,
+    "invalid_station_timestamp_or_temperature": 2,
+    "rejected_quality_or_unrecognized_source": 125,
+    "duplicate_station_timestamps": 0,
+    "retained_observations": 39925
+  },
+  "splits": {
+    "train": {
+      "hourly_positions": 17471,
+      "missing_hours": 10,
+      "candidate_origins": 17471,
+      "usable_examples": 17312,
+      "dropped_incomplete_or_boundary_examples": 159
+    },
+    "validation": {
+      "hourly_positions": 4367,
+      "missing_hours": 4,
+      "candidate_origins": 4367,
+      "usable_examples": 4287,
+      "dropped_incomplete_or_boundary_examples": 80
+    },
+    "test": {
+      "hourly_positions": 4367,
+      "missing_hours": 123,
+      "candidate_origins": 4367,
+      "usable_examples": 4070,
+      "dropped_incomplete_or_boundary_examples": 297
+    }
+  },
+  "versions": {
+    "python": "3.12.14",
+    "torch": "2.11.0+cu128",
+    "cuda": "12.8",
+    "numpy": "2.3.5",
+    "pandas": "3.0.1"
+  },
+  "measurement_date": "2026-11-04",
+  "execution_environment": "Local Windows workstation",
+  "pilot_script_sha256_lf": "46dd96cf77df364682f929f43ea18d4758065c5be59aafa627bbd3d1fee70dc4",
+  "timing_note": "One measured epoch after model and data setup; CUDA synchronized before and after; no training warm-up."
+}

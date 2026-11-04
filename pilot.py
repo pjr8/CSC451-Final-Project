@@ -116,8 +116,8 @@ def run(args):
         raise ValueError("No complete training examples remain after cleaning.")
     pilot_count = math.ceil(full_count * 0.10)
     pilot = training.iloc[:pilot_count]  # First 10% chronologically, never validation/test.
-    x = pilot.iloc[:, :INPUT_HOURS].to_numpy(dtype=np.float32)
-    y = pilot[["target"]].to_numpy(dtype=np.float32)
+    x = pilot.iloc[:, :INPUT_HOURS].to_numpy(dtype=np.float32, copy=True)
+    y = pilot[["target"]].to_numpy(dtype=np.float32, copy=True)
     mean, std = x.mean(axis=0), x.std(axis=0)
     std[std == 0] = 1
     x = (x - mean) / std  # Fit scaling on this pilot's training inputs only.

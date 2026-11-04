@@ -10,6 +10,8 @@ The complete 2023–2025 station data is included as [compressed raw files](data
 
 With the included data and cleaning rules, there are **17,312 training examples**, **4,287 validation examples**, and **4,070 test examples**. The default pilot trains on the first **1,732** training examples. Raw records and forecasting examples are different counts: one example needs 24 hourly inputs plus a later target.
 
+[Measured early-pilot results and saved artifacts](results/README.md): the RTX 3070 Ti run took **0.243 seconds for one epoch**, estimating **0.81 minutes for 20 full-data epochs**. This is an RTX measurement, not a T4 measurement.
+
 ### Google Colab T4
 
 1. Open a Colab notebook and choose **Runtime → Change runtime type → T4 GPU**.
@@ -30,6 +32,18 @@ drive.mount('/content/drive')
 ```
 
 `--require-t4` stops with an error if the selected runtime is not a T4. The report records the actual GPU name. GPU work is synchronized before and after timing.
+
+### Local NVIDIA GPU
+
+For a compatible NVIDIA GPU and driver, install the CUDA build and run:
+
+```bash
+python -m pip install "torch==2.11.0+cu128" --index-url https://download.pytorch.org/whl/cu128
+python -m pip install -r requirements.txt
+python pilot.py --require-gpu
+```
+
+`--require-gpu` prevents an accidental CPU measurement. The report records the detected GPU model.
 
 ### Local CPU check
 
