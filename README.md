@@ -2,6 +2,105 @@
 
 Local temperature forecasting with a small PyTorch neural network. The project will predict the temperature three hours ahead from the previous 24 hourly temperatures and compare it with persistence and linear regression.
 
+## What the data means
+
+Each raw NOAA row is a weather observation from one station at one time. For this project, all observations come from Hartford Bradley International Airport. The first model will use **temperature history only**. The other columns identify the station, organize the observations, or help check data quality.
+
+| Raw field | Meaning | How we will use it |
+|---|---|---|
+| `STATION` | Station identifier; `USW00014740` is Hartford Bradley. | Keep records from the chosen station. Not a numeric model input. |
+| `DATE` | Time of the observation, in UTC. | Sort readings, build hourly values, and align inputs with the future target. Not a numeric model input. |
+| `temperature` | Air temperature near 2 metres above the ground, in degrees Celsius. `10.0` means **10.0°C**, not 1.0°C. | The measured value used to build the 24 input temperatures and the training target. |
+| `temperature_Quality_Code` | NOAA quality-control result. Its meaning depends on the source. | Filter readings before training; not a temperature or a confidence percentage. |
+| `temperature_Report_Type` | Weather-report format. `FM15` is a routine METAR, `FM16` is a special SPECI, and `FM12` is a fixed-land SYNOP report. | Preserve provenance; not a model input. |
+| `temperature_Source_Code` | Identifies the upstream source of the observation. | Interpret quality codes correctly and preserve provenance; not a model input. |
+
+In these samples, quality code `5` with source `343` means the value passed all quality checks and came from an NCEI source. Code `1` with source `223` means good quality. These definitions are source-specific; a larger code does not mean better quality. See the [NOAA documentation](https://www.ncei.noaa.gov/oa/global-historical-climatology-network/hourly/doc/ghcnh_DOCUMENTATION.pdf), sections IV, VI, and VII.
+
+## From raw observations to hourly temperatures
+
+The training-data plan uses the station's 2023–2025 files. The 20 rows below are source examples, not the complete training dataset.
+
+1. Read the timestamps as UTC and temperatures as numeric Celsius values. Reject missing, invalid, or unacceptable quality-flagged readings using NOAA's source-specific definitions, and remove duplicate station/time records.
+2. Group valid readings into hours ending at an exact UTC hour. For an endpoint `h`, choose the **last valid observation in `(h − 1 hour, h]`**. A report exactly at `h` belongs to that endpoint. No later report can fill an earlier hour.
+3. Label that hourly value `T(h)`. If the hour has no valid observation, leave it missing; do not interpolate or carry an older value forward.
+4. Form examples only when all 24 input hours and the three-hour-ahead target are available. Log how many records and examples each cleaning step removes.
+
+For example, among the displayed samples, the last observation before **01:00 UTC** is the **00:59** reading, so `T(01:00) = 10.0°C`. The last observation before **02:00** is the **01:51** reading, so `T(02:00) = 9.4°C`.
+
+## Exact model inputs and output
+
+Let `t` be the latest completed hourly endpoint. One input is **24 temperatures ordered from oldest to newest**:
+
+```text
+Input X(t) = [T(t−23), T(t−22), ..., T(t−1), T(t)]
+Target y(t) = T(t+3)
+```
+
+| Item | Exact definition |
+|---|---|
+| Number of input features | 24 numeric Celsius temperatures, one per consecutive hour. |
+| Forecast horizon | Three hours after the latest input endpoint. |
+| Model | PyTorch MLP: `24 → 64 → 32 → 1`, with ReLU hidden layers and a linear output. |
+| Input tensor | `float32`, shape `(batch_size, 24)`; one forecast uses `(1, 24)`. |
+| Training target | The observed hourly temperature at `t+3`, shape `(batch_size, 1)`, in Celsius. |
+| Prediction | One estimated temperature in Celsius. Negative values are allowed. |
+
+Before training and inference, standardize each input position using its mean and standard deviation from the **training set only**. Save those statistics and reuse them for validation, testing, and the app. Keep the target in Celsius. The app takes Celsius readings and applies the saved input transformation automatically.
+
+The model does not receive humidity, wind, pressure, station IDs, quality codes, or future readings. Timestamps control ordering and alignment, but are not among the 24 features. During training, `T(t+3)` is the known answer used to calculate error. During a real forecast, that future observation is unavailable and is not supplied to the model. Temperatures at `t+1` and `t+2` are not inputs either.
+
+## Exact app input format
+
+The planned Streamlit app accepts a CSV with **exactly 24 rows** and these two columns:
+
+| Column | Required contents |
+|---|---|
+| `timestamp_utc` | An ISO 8601 UTC timestamp ending in `Z`, on an exact hour. The 24 timestamps must be unique and consecutive, oldest first. |
+| `temperature_c` | A finite numeric Celsius temperature for that hourly endpoint. Negative values are valid. |
+
+Each CSV row represents an hourly value already prepared by the rule above, not an individual raw NOAA report. The app validates the rows, extracts the temperatures in order, applies the saved scaling, and predicts the temperature at the last timestamp plus three hours. No target column is required.
+
+This **illustrative CSV** shows the format; its temperatures are invented examples, not additional NOAA records:
+
+```csv
+timestamp_utc,temperature_c
+2025-01-01T13:00:00Z,2.1
+2025-01-01T14:00:00Z,2.4
+2025-01-01T15:00:00Z,2.8
+2025-01-01T16:00:00Z,3.0
+2025-01-01T17:00:00Z,2.7
+2025-01-01T18:00:00Z,2.2
+2025-01-01T19:00:00Z,1.8
+2025-01-01T20:00:00Z,1.2
+2025-01-01T21:00:00Z,0.8
+2025-01-01T22:00:00Z,0.4
+2025-01-01T23:00:00Z,0.1
+2025-01-02T00:00:00Z,-0.2
+2025-01-02T01:00:00Z,-0.5
+2025-01-02T02:00:00Z,-0.8
+2025-01-02T03:00:00Z,-1.0
+2025-01-02T04:00:00Z,-1.1
+2025-01-02T05:00:00Z,-1.0
+2025-01-02T06:00:00Z,-0.7
+2025-01-02T07:00:00Z,-0.3
+2025-01-02T08:00:00Z,0.2
+2025-01-02T09:00:00Z,0.9
+2025-01-02T10:00:00Z,1.6
+2025-01-02T11:00:00Z,2.3
+2025-01-02T12:00:00Z,3.0
+```
+
+For this input, the latest endpoint is **January 2, 2025 at 12:00 UTC**, and the model predicts **January 2 at 15:00 UTC**. The persistence baseline predicts **3.0°C**, the latest input value. The neural model's prediction can only be obtained after training and running it.
+
+The raw sample file below cannot be uploaded directly as this 24-hour CSV: it has multiple reports per hour and covers less than 24 hours.
+
+## Training and evaluation alignment
+
+Build the hourly series and forecasting examples separately within the chronological train, validation, and test partitions. Keep complete weeks together and drop examples whose inputs or target cross a partition boundary. Fit scaling on training data only, choose settings using validation data, and reserve the test partition for the final evaluation.
+
+Persistence predicts the latest temperature, `T(t)`. Linear regression and the MLP both use the same 24-feature input and the same eligible examples. Compare their predictions with the observed `T(t+3)` using MAE and RMSE in Celsius.
+
 ## Raw data samples
 
 The table below displays selected columns from **20 original NOAA GHCNh records** for **Hartford Bradley International Airport, Connecticut (USW00014740)**. The original file preserves all **329 columns**, including NOAA metadata and quality flags.
