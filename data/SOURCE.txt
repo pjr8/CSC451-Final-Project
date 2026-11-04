@@ -1,0 +1,12 @@
+NOAA GHCNh raw samples
+Station: USW00014740, HARTFORD-BRADLEY INTL AP
+Source: https://www.ncei.noaa.gov/oa/global-historical-climatology-network/hourly/access/by-year/2023/psv/GHCNh_USW00014740_2023.psv
+Downloaded: November 4, 2026
+Selection: first 20 data records, with the original full header and columns.
+No values, flags, line endings, or record order were changed.
+This is raw source evidence, not 20 cleaned training examples.
+Source file SHA256: f7d3b13b9ed63f3919d076eabb3c611eb17c75cb955324c138f6e6e260a3a612
+Sample file SHA256: 56a4d07c3da1ad4ac1293b1304c0bf892dcf434b4e31779620811330c7bacdd6
+Documentation: https://www.ncei.noaa.gov/oa/global-historical-climatology-network/hourly/doc/ghcnh_DOCUMENTATION.pdf
+License: CC0-1.0, as stated by NOAA at https://www.ncei.noaa.gov/access/metadata/landing-page/bin/iso?id=gov.noaa.ncdc:C01688
+Citation: Menne et al. (2023), Global Historical Climatology Network-Hourly (GHCNh), NOAA NCEI, https://doi.org/10.25921/jp3d-3v19.
